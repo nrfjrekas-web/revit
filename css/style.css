@@ -36,7 +36,8 @@ textarea.in{min-height:84px}
 table.t{width:100%;border-collapse:collapse;font-size:13px}
 table.t th{text-align:left;font-weight:700;border-bottom:2px solid var(--ink);padding:6px 4px;vertical-align:bottom}
 table.t td{border-bottom:1px solid var(--line);padding:6px 4px;vertical-align:top}
-.r{text-align:right}
+table.t th.r,.r{text-align:right}
+table.t th.r,table.t td.r{padding-right:14px}
 #print{position:fixed;inset:0;background:#fff;overflow:auto;z-index:60;color:#000}
 .doc{max-width:760px;margin:0 auto;padding:20px 24px 60px;font-family:'Archivo',Arial,sans-serif;font-size:13px}
 .kop{text-align:center;border-bottom:3px double #000;padding-bottom:8px;margin-bottom:14px}
