@@ -26,5 +26,12 @@ tools/smoke.js        uji asap tanpa browser: node tools/smoke.js
 - Setelah mengubah `backend/Code.gs`, jalankan `python3 tools/sync-gas.py`. Code.gs tidak boleh berisi backtick, `${`, atau backslash.
 - Penyimpanan: localStorage kunci `sirevital_v2`; sesi peran `sirevital_v2_u`.
 
+## Tampilan desktop
+Mulai lebar 1024 px (`@media (min-width:1024px)` di akhir `css/style.css`), tampilan berubah; di bawah itu tetap mobile-first 480 px seperti semula.
+- Sidebar kiri (`#side`, dibangun `sideBuild()` di `core/nav.js`) memuat semua halaman milik peran, jadi halaman Menu dan navbar bawah tidak dipakai.
+- Atribut `data-p` di `#view` menandai halaman aktif; CSS memakainya untuk tata letak: isian di kiri, riwayat di kanan (Masuk, Keluar, Progres, Absen, Kas), dua kolom (Beranda, Laporan), satu kolom terbatas (Pengaturan, Stok).
+- Layar PIN terbagi dua dengan panel merek, dan PIN bisa diketik dari papan tombol.
+- Menambah halaman baru: cukup daftarkan seperti biasa; bila ingin tata letak khusus desktop, tambahkan aturan `#view[data-p=nama]` di blok desktop.
+
 ## Data awal
 Aplikasi mulai benar-benar kosong: tidak ada identitas sekolah, pejabat, PIN, RAB, material, maupun pekerja bawaan. Saat pertama dibuka (belum ada PIN) tampil layar **Pengaturan awal**: identitas sekolah, baris atas kop dan kota tanda tangan, tahun anggaran, tanggal mulai (wajib), nama pejabat (boleh kosong), dan tiga PIN 4 angka yang berbeda. Perangkat baru dapat memilih "Ambil data dari Google Sheet" di layar yang sama. Setelah itu Beranda menampilkan panel "Mulai di sini" sampai RAB, material, dan pekerja terisi. Total RAB 0 berarti dihitung otomatis dari jumlah item RAB.
