@@ -60,3 +60,20 @@ ok('kop tanpa baris atas bila tidak diisi; kota tanda tangan dari pengaturan',r.
  el('sgas').value='https://x/exec';el('stok').value='tok';await run('pullAwal()');
  ok('Sheet tanpa PIN: ditolak dengan pesan jelas',els.toast.textContent.includes('belum memuat PIN'));
 })();
+
+// ===== Sinkron otomatis =====
+(async()=>{
+ await new Promise(r=>setTimeout(r,50));
+ const calls=[];
+ run("db.CONFIG.gas_url='https://x/exec';db.CONFIG.gas_token='tok';db.CONFIG.gas_ver=4");
+ ctx.fetch=async(u,o)=>{calls.push({u,o});return{json:async()=>o&&o.method==='POST'?{ok:true,ver:5,photos:[]}:{ver:5}}};
+ run("SY.applying=false;ls.del(K+'_dirty');ls.del(K+'_auto')");
+ run("commit()");
+ ok('perubahan menandai data belum terkirim',run("syDirty()")===true);
+ await run("syPush()");
+ ok('kirim otomatis: POST, versi naik, penanda bersih',calls.some(c=>c.o&&c.o.method==='POST')&&run("db.CONFIG.gas_ver")===5&&run("syDirty()")===false);
+ calls.length=0;await run("syPull()");
+ ok('tarik otomatis dilewati bila versi Sheet sama',calls.length===1&&calls[0].u.includes('action=ver'));
+ run("user={role:Object.keys(ROLES)[0],nama:'t'}");run("syToggle()");run("commit()");
+ ok('matikan sinkron otomatis: perubahan tidak dikirim sendiri',run("ls.get(K+'_auto')")==='0'&&run("syOn()")===false);
+})();
