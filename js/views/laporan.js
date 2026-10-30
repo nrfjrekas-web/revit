@@ -1,0 +1,10 @@
+const LR=(i,t,d,k,x)=>`<button class="rw !items-center" style="min-height:72px;border-top-width:${x?1:0}px" onclick="${k}">${ic(i)}<span class="flex-1">${t}<br><span class="mu text-xs font-normal">${d}</span></span>${ic('chev')}</button>`;
+V.laporan=()=>{
+ const f=fisik(),st=p=>f>=p?'Progres sudah '+fmt(f)+'%, siap dibuat':'Belum tercapai, progres sekarang '+fmt(f)+'%';
+ return `<p class="mu text-sm mb-4">Ketuk salah satu laporan untuk melihat pratinjau. Dari pratinjau, Anda bisa mencetak atau menyimpannya sebagai PDF.</p>
+ <h2 class="text-[15px] font-bold mb-2">Laporan rutin</h2>
+ <section class="pn !py-0">${LR('kas','Buku Kas Umum (BKU)','Catatan uang masuk dan keluar, '+db.TRX_KEUANGAN.length+' transaksi',"cetak('bku')",0)}${LR('stok','Daftar stok gudang','Sisa tiap material, '+db.DB_MATERIAL.length+' jenis',"cetak('stok')",1)}${LR('progres','Laporan mingguan','Pilih minggu 1 sampai 12',"go('mingguan')",1)}</section>
+ <h2 class="text-[15px] font-bold mt-6 mb-2">Dokumen tahap proyek</h2>
+ <section class="pn !py-0">${LR('laporan','Serah terima 50% (BAST)',st(50),"cetak('b50')",0)}${LR('laporan','Serah terima 100% (BAST)',st(100),"cetak('b100')",1)}${LR('laporan','Laporan akhir (LPJ)','Gabungan RAB, kas, stok, dan upah',"cetak('lpj')",1)}</section>`;
+};
+V.mingguan=()=>{const t=today();return `<p class="mu text-sm mb-3">Pilih minggu yang ingin dilaporkan.</p><section class="pn !py-0">${Array.from({length:12},(_,i)=>{const a=addD(C().tgl_mulai,i*7),z=addD(a,6),n=db.TRX_PROGRES.filter(x=>x.tanggal>=a&&x.tanggal<=z).length,h=new Set(db.TRX_ABSEN.filter(x=>x.tanggal>=a&&x.tanggal<=z&&x.hadir==='Ya').map(x=>x.tanggal)).size,now=t>=a&&t<=z;return `<button class="rw !items-center" style="min-height:68px;border-top-width:${i?1:0}px" onclick="cetak('mg',${i+1})"><span class="flex-1">Minggu ${i+1}${now?' <span class="st ok ml-1 whitespace-nowrap">Minggu ini</span>':''}<br><span class="mu text-xs font-normal">${fd(a).slice(0,5)} sampai ${fd(z).slice(0,5)}, ${n||h?n+' laporan progres, '+h+' hari kerja':'belum ada data'}</span></span>${ic('chev')}</button>`}).join('')}</section>`};
