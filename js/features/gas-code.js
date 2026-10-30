@@ -29,6 +29,7 @@ function version() {
 function doGet(e) {
   const p = (e && e.parameter) || {};
   if (p.token !== TOKEN) return out({ error: 'token' });
+  if (p.action === 'ver') return out({ ver: version() });
   const d = readAll();
   d.ver = version();
   return out(d);
