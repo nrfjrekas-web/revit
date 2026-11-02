@@ -1,7 +1,7 @@
 /* Sinkronisasi Google Sheet: kirim (push) dan tarik (pull). Backend: backend/Code.gs */
 const gasUrl=()=>db.CONFIG.gas_url||GAS_URL;
 const myPin=()=>ls.get(K+'_lp')||'';
-const rolePin=()=>user&&C()['pin_'+{sek:'sekretaris',mandor:'mandor',kepsek:'kepsek',bend:'bendahara'}[user.role]]||'';
+const rolePin=()=>user&&C()['pin_'+{sek:'sekretaris',mandor:'mandor',kepsek:'kepsek',bend:'bendahara',op:'operator'}[user.role]]||'';
 const syPin=()=>{const p=rolePin();if(p)ls.set(K+'_lp',String(p))};
 function applyData(d,u,t){
  Object.keys(SEED).forEach(k=>{if(d[k]!==undefined)db[k]=Array.isArray(SEED[k])?d[k]:Object.assign({},SEED[k],d[k])});

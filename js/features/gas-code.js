@@ -7,7 +7,7 @@ const GAS=`// SI-REVITAL LITE - Backend Google Apps Script (v2)
 const TOKEN = '3388932Fajar5557';
 const FOLDER = 'SI-REVITAL';
 const TABLES = ['CONFIG', 'DB_RAB', 'DB_MATERIAL', 'DB_PEKERJA', 'TRX_MASUK', 'TRX_KELUAR', 'TRX_PROGRES', 'TRX_ABSEN', 'TRX_KEUANGAN', 'LOG_AKTIVITAS'];
-const TEXT_COLS = ['no_nota', 'supplier', 'nip_kepsek', 'kode_desa', 'tahun_anggaran', 'pin_sekretaris', 'pin_mandor', 'pin_kepsek', 'pin_bendahara'];
+const TEXT_COLS = ['no_nota', 'supplier', 'nip_kepsek', 'kode_desa', 'tahun_anggaran', 'pin_sekretaris', 'pin_mandor', 'pin_kepsek', 'pin_bendahara', 'pin_operator'];
 const SKIP_KEYS = ['gas_url', 'gas_token', 'gas_ver'];
 const SS = SpreadsheetApp.getActiveSpreadsheet();
 const PROP = PropertiesService.getScriptProperties();
@@ -41,7 +41,7 @@ function auth(token, pin) {
   if (Date.now() < Number(PROP.getProperty('LOCK') || 0)) return 'lock';
   const c = readConfig();
   if (!c.pin_sekretaris) return 'kosong';
-  const roles = { sek: c.pin_sekretaris, mandor: c.pin_mandor, kepsek: c.pin_kepsek, bend: c.pin_bendahara };
+  const roles = { sek: c.pin_sekretaris, mandor: c.pin_mandor, kepsek: c.pin_kepsek, bend: c.pin_bendahara, op: c.pin_operator };
   const p = String(pin);
   for (const r in roles) {
     if (roles[r] && roles[r] === p) { PROP.deleteProperty('FAIL'); return r; }
