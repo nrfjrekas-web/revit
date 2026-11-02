@@ -1,5 +1,4 @@
-# SI-REVITAL LITE (SDN Klompangan 01)
-
+# SI-REVITAL LITE 
 Aplikasi statis tanpa proses build. Unggah seluruh folder ini ke hosting statis (Cloudflare Pages, Netlify, GitHub Pages) atau buka `index.html` langsung.
 
 ## Struktur
