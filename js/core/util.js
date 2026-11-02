@@ -26,3 +26,6 @@ const keluarKas=()=>sum(db.TRX_KEUANGAN,'kas_keluar');
 const saldo=()=>sum(db.TRX_KEUANGAN,'kas_masuk')-keluarKas();
 function status(m){const a=masuk(m.id_material);if(!a)return['BELUM MASUK','mu'];const s=stok(m.id_material);return s<=0?['HABIS','bd']:s<=num(m.stok_minimum)?['MENIPIS','wn']:['AMAN','ok']}
 const kritis=()=>db.DB_MATERIAL.filter(m=>['HABIS','MENIPIS'].includes(status(m)[0]));
+
+/* Tampilan foto penuh (nota, barang) */
+function lihatFoto(k,i,j){const o=({masuk:db.TRX_MASUK})[k][i],u=o&&o[j==='nota'?'foto_nota_url':'foto_barang_url'];if(!u)return;const d=document.createElement('div');d.className='fixed inset-0 z-[70] flex flex-col items-center justify-center bg-slate-900/80 p-4';d.innerHTML='<img src="'+u+'" alt="Foto '+j+'" style="max-width:100%;max-height:80vh;border-radius:6px;background:#fff"><button class="btn alt sm mt-4" style="width:auto">Tutup</button>';document.body.appendChild(d);d.onclick=()=>d.remove()}

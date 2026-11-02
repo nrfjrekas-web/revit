@@ -8,9 +8,9 @@ V.progres=()=>{
   ${F('Cuaca','<select class="in" name="cuaca"><option>Cerah</option><option>Berawan</option><option>Hujan ringan</option><option>Hujan deras</option></select>')}
   ${F('Kendala','<textarea class="in" name="ken" placeholder="Kosongkan jika tidak ada"></textarea>')}
   ${F('Kebutuhan besok','<textarea class="in" name="beso" placeholder="Material, alat, atau tenaga"></textarea>')}
-  ${F('Foto kondisi awal (0%)','<input class="in" type="file" name="f1" accept="image/*" capture="environment">')}
-  ${F('Foto proses','<input class="in" type="file" name="f2" accept="image/*" capture="environment">')}
-  ${F('Foto selesai','<input class="in" type="file" name="f3" accept="image/*" capture="environment">')}
+  ${F('Foto dokumentasi: kondisi awal (0%)','<input class="in" type="file" name="f1" accept="image/*" capture="environment">')}
+  ${F('Foto dokumentasi: proses','<input class="in" type="file" name="f2" accept="image/*" capture="environment">')}
+  ${F('Foto dokumentasi: selesai','<input class="in" type="file" name="f3" accept="image/*" capture="environment">')}
   <button class="btn" id="pb">Simpan progres</button>
  </form>
  ${H2('Laporan terakhir')}

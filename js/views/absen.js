@@ -4,7 +4,7 @@ V.absen=()=>{
   ${F('Tanggal',`<input class="in" type="date" name="tgl" value="${today()}" onchange="absUpd(1)" required>`)}
   <div id="wl"></div>
   <div class="rounded p-3 my-4" style="background:var(--bg)"><span class="mu text-sm">Total upah hari ini</span><p class="text-2xl font-extrabold" id="up">Rp 0</p></div>
-  ${F('Foto absen (opsional)','<input class="in" type="file" name="foto" accept="image/*" capture="environment">')}
+  ${F('Foto dokumentasi absen (opsional)','<input class="in" type="file" name="foto" accept="image/*" capture="environment">')}
   <button class="btn">Simpan absensi</button>
  </form>
  ${user.role==='sek'?`${H2('Rekap upah terbaru')}<section class="pn !py-0">${rekapAbsen().slice(0,6).map(x=>`<div class="rl py-3 flex justify-between"><span class="text-sm">${fd(x[0])}, ${x[1]} hadir</span><b class="text-sm">${rp(x[2])}</b></div>`).join('')||empty('Belum ada absensi.')}</section>`:''}`;

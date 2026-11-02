@@ -139,3 +139,7 @@ table.t th.r,table.t td.r{padding-right:14px}
 }
 @media (min-width:1440px){#view{max-width:1320px}}
 @media print{#side{display:none!important}}
+
+.thumb{display:flex;flex-direction:column;align-items:center;gap:2px;width:64px;font-size:11px;font-weight:600;color:var(--mute);background:none;padding:0}
+.thumb img{width:64px;height:48px;object-fit:cover;border:1px solid var(--line);border-radius:4px}
+.thumb:focus-visible{outline:3px solid #93C5FD;outline-offset:1px}

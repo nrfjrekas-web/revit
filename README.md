@@ -1,4 +1,5 @@
-# SI-REVITAL LITE 
+# SI-REVITAL LITE (SDN Klompangan 01)
+
 Aplikasi statis tanpa proses build. Unggah seluruh folder ini ke hosting statis (Cloudflare Pages, Netlify, GitHub Pages) atau buka `index.html` langsung.
 
 ## Struktur
@@ -31,6 +32,11 @@ Mulai lebar 1024 px (`@media (min-width:1024px)` di akhir `css/style.css`), tamp
 - Atribut `data-p` di `#view` menandai halaman aktif; CSS memakainya untuk tata letak: isian di kiri, riwayat di kanan (Masuk, Keluar, Progres, Absen, Kas), dua kolom (Beranda, Laporan), satu kolom terbatas (Pengaturan, Stok).
 - Layar PIN terbagi dua dengan panel merek, dan PIN bisa diketik dari papan tombol.
 - Menambah halaman baru: cukup daftarkan seperti biasa; bila ingin tata letak khusus desktop, tambahkan aturan `#view[data-p=nama]` di blok desktop.
+
+## Foto
+- Barang masuk wajib dua foto terpisah: nota (`foto_nota_url`) dan barang yang diterima (`foto_barang_url`). Saat Ubah, foto lama dipakai bila tidak diganti.
+- Dokumentasi progres (`foto1_url`, `foto2_url`, `foto3_url`) dan dokumentasi absen (`foto_absen_url`) tetap kolom tersendiri.
+- Pratinjau foto nota dan barang tampil di daftar Barang masuk; ketuk untuk memperbesar (`lihatFoto` di `core/util.js`).
 
 ## Data awal
 Aplikasi mulai benar-benar kosong: tidak ada identitas sekolah, pejabat, PIN, RAB, material, maupun pekerja bawaan. Saat pertama dibuka (belum ada PIN) tampil layar **Pengaturan awal**: identitas sekolah, baris atas kop dan kota tanda tangan, tahun anggaran, tanggal mulai (wajib), nama pejabat (boleh kosong), dan tiga PIN 4 angka yang berbeda. Perangkat baru dapat memilih "Ambil data dari Google Sheet" di layar yang sama. Setelah itu Beranda menampilkan panel "Mulai di sini" sampai RAB, material, dan pekerja terisi. Total RAB 0 berarti dihitung otomatis dari jumlah item RAB.

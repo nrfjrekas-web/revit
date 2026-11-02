@@ -1,6 +1,6 @@
 /* ===== HALAMAN ===== */
 const V={},A={};
-const MD={dash:'Ringkasan progres, dana, dan stok',masuk:'Catat belanja material dan foto nota',keluar:'Catat pengambilan material gudang',stok:'Sisa stok dan status tiap material',progres:'Laporan kemajuan fisik harian',absen:'Kehadiran pekerja dan upah harian',kas:'Pencairan dana dan buku kas umum',laporan:'Laporan kas, stok, mingguan, dan serah terima',setting:'Identitas, PIN, RAB, material, pekerja'};
+const MD={dash:'Ringkasan progres, dana, dan stok',masuk:'Catat belanja material, foto nota, dan foto barang',keluar:'Catat pengambilan material gudang',stok:'Sisa stok dan status tiap material',progres:'Laporan kemajuan fisik harian',absen:'Kehadiran pekerja dan upah harian',kas:'Pencairan dana dan buku kas umum',laporan:'Laporan kas, stok, mingguan, dan serah terima',setting:'Identitas, PIN, RAB, material, pekerja'};
 V.menu=()=>{const R=ROLES[user.role],L=R.pages.filter(p=>!R.nav.includes(p));return `<section class="pn !py-0">${L.map((p,i)=>`<button class="rw !items-center" style="min-height:68px;border-top-width:${i?1:0}px" onclick="go('${p}')">${ic(p)}<span class="flex-1">${PG[p]}<br><span class="mu text-xs font-normal">${MD[p]}</span></span></button>`).join('')}</section>`};
 const mulai=()=>{
  const st=[['RAB','set2',db.DB_RAB.length],['Material','set3',db.DB_MATERIAL.length],['Pekerja dan tarif HOK','set4',db.DB_PEKERJA.length]];

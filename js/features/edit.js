@@ -20,7 +20,7 @@ function ubah(k,i){
  if(k==='kas')f.th.value=(String(o.uraian).match(/Tahap \d/)||['Tahap 1'])[0];
  [...f.querySelectorAll('button')].pop().textContent='Simpan perubahan';
  f.insertAdjacentHTML('beforebegin','<div class="rounded p-3 mb-3 flex items-center justify-between gap-3" style="background:#DBEAFE"><span class="text-sm font-semibold">Mengubah data yang sudah tersimpan</span><button type="button" class="btn alt sm" onclick="EDIT=null;go(page)">Batal</button></div>');
- if(k==='masuk')masUpd();if(k==='keluar')kelUpd();if(k==='progres')proUpd();
+ if(k==='masuk'){f.foto.required=!o.foto_nota_url;f.fotob.required=!o.foto_barang_url;masUpd()}if(k==='keluar')kelUpd();if(k==='progres')proUpd();
  scrollTo(0,0);
 }
 async function hapus(k,i){

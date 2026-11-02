@@ -9,7 +9,8 @@ class FormData{constructor(f){this.d=Object.entries(f.__data)}[Symbol.iterator](
 let sheet={CONFIG:{nama_sekolah:'SD Contoh',pin_sekretaris:'1111',pin_mandor:'2222',pin_kepsek:'3333',tgl_mulai:'2026-11-02',total_rab:0},DB_RAB:[],ver:4};
 const ctx={tailwind:{},console,setTimeout,clearTimeout,Promise,JSON,Math,Date,FormData,
  localStorage:{getItem:k=>store[k]??null,setItem:(k,v)=>{store[k]=v},removeItem:k=>{delete store[k]}},
- document:{getElementById:el,createElement:()=>mk(),body:mk(),addEventListener(){},querySelector:()=>mk(),querySelectorAll:()=>[]},
+ FileReader:class{readAsDataURL(){this.result='data:x';setTimeout(()=>this.onload(),0)}},Image:class{constructor(){this.width=100;this.height=100}set src(v){setTimeout(()=>this.onload(),0)}},
+ document:{getElementById:el,createElement:t=>t==='canvas'?mk({getContext:()=>mk(),toDataURL:()=>'data:image/jpeg;base64,AAAA'}):mk(),body:mk(),addEventListener(){},querySelector:()=>mk(),querySelectorAll:()=>[]},
  navigator:{},scrollTo(){},print(){},fetch:async()=>({json:async()=>sheet})};
 ctx.window=ctx;vm.createContext(ctx);
 const run=c=>vm.runInContext(c,ctx);
@@ -50,7 +51,15 @@ const r=run(`(()=>{const bad=[];const chk=(t,f)=>{try{const h=f();if(typeof h===
 ok('semua halaman dan cetak bebas NaN/galat'+(r.bad.length?' '+JSON.stringify(r.bad):''),r.bad.length===0);
 ok('kop tanpa baris atas bila tidak diisi; kota tanda tangan dari pengaturan',r.kopTanpaBarisAtas&&r.kota&&r.nama);
 (async()=>{
- run('ask=async()=>true');
+run('ask=async()=>true');
+ run("user={role:'sek',nama:'Sekretaris'};db.DB_MATERIAL.push({id_material:'M001',nama_material:'Semen',satuan:'sak',stok_minimum:1,harga_acuan_siplah:1000})");
+ const fm=(a,b)=>({preventDefault(){},target:{mat:{value:'M001'},qty:{value:'5'},harga:{value:'1000'},tgl:{value:'2026-11-02'},sup:{value:'Toko'},nota:{value:'N1'},foto:{files:a?[{}]:[]},fotob:{files:b?[{}]:[]}}});
+ ctx.fm=fm;
+ await run('subMasuk(fm(true,false))');ok('barang masuk tanpa foto barang ditolak',run('db.TRX_MASUK.length')===0&&els.toast.textContent.includes('wajib'));
+ await run('subMasuk(fm(false,true))');ok('barang masuk tanpa foto nota ditolak',run('db.TRX_MASUK.length')===0);
+ els.fm=mk({mat:{value:'M001'},qty:{value:''},harga:{value:''}});
+ await run('subMasuk(fm(true,true))');ok('barang masuk dengan nota dan foto barang tersimpan terpisah',run("db.TRX_MASUK.length===1&&!!db.TRX_MASUK[0].foto_nota_url&&!!db.TRX_MASUK[0].foto_barang_url"));
+ ok('daftar barang masuk menampilkan pratinjau nota dan barang',run("V.masuk().includes('lihatFoto')&&V.masuk().includes('Foto barang')"));
  await run('resetData()');
  ok('hapus data: kembali ke pengaturan awal, PIN lama tidak berlaku',(run("!!GAS_URL")?(els.login.hidden===false&&els.setup.hidden===true):(els.setup.hidden===false&&els.login.hidden===true))&&run("!C().pin_sekretaris")&&!store.sirevital_v2_u);
  el('sgas').value='https://x/exec';el('stok').value='tok';
