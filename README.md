@@ -51,3 +51,12 @@ Aplikasi mulai benar-benar kosong: tidak ada identitas sekolah, pejabat, PIN, RA
 4. Setelah itu perangkat mana pun cukup memasukkan PIN. Server memeriksa PIN, lalu mengirim data sesuai peran. Sinkron otomatis memakai PIN yang sama, tanpa token.
 
 Keamanan: URL Web App bersifat publik, tetapi data hanya dikirim bila PIN benar. Sepuluh PIN salah berturut-turut mengunci login PIN selama 15 menit. TOKEN admin tidak ditaruh di kode aplikasi.
+
+## Peran Bendahara
+
+- PIN bendahara diisi di Pengaturan (opsional, harus 4 angka dan berbeda dari PIN lain). Setelah itu bendahara login dengan PIN-nya dan langsung masuk ke halaman Tugas.
+- Menu bendahara: Tugas, Beranda, Kas dan BKU, Barang masuk, Absensi dan upah, Stok gudang, Laporan dan cetak.
+- Halaman Tugas: saldo kas, daftar tugas hari ini (pencairan dana, nota dan foto belanja, upah hari ini, pengeluaran lain, saldo), pintasan laporan harian, mingguan, bulanan, dan panduan tugas rutin.
+- Kas dan BKU: selain pencairan dana, bendahara mencatat pengeluaran lain (ATK, transport, konsumsi, pajak, sewa alat, lain-lain). Belanja material dan upah tetap otomatis dari halaman asalnya.
+- Laporan keuangan di halaman Laporan dan cetak: harian (pilih tanggal), mingguan (minggu 1 sampai 12 sesuai tanggal mulai), bulanan (pilih bulan). Isinya saldo awal, penerimaan, pengeluaran per jenis, rincian kas, belanja dan nota, upah, dengan tanda tangan Komite, Bendahara, dan Kepala Sekolah.
+- Backend: pasang ulang `backend/Code.gs` (PIN bendahara ikut diperiksa server) lalu deploy versi baru.

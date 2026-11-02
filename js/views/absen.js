@@ -7,7 +7,7 @@ V.absen=()=>{
   ${F('Foto dokumentasi absen (opsional)','<input class="in" type="file" name="foto" accept="image/*" capture="environment">')}
   <button class="btn">Simpan absensi</button>
  </form>
- ${user.role==='sek'?`${H2('Rekap upah terbaru')}<section class="pn !py-0">${rekapAbsen().slice(0,6).map(x=>`<div class="rl py-3 flex justify-between"><span class="text-sm">${fd(x[0])}, ${x[1]} hadir</span><b class="text-sm">${rp(x[2])}</b></div>`).join('')||empty('Belum ada absensi.')}</section>`:''}`;
+ ${user.role==='sek'||user.role==='bend'?`${H2('Rekap upah terbaru')}<section class="pn !py-0">${rekapAbsen().slice(0,6).map(x=>`<div class="rl py-3 flex justify-between"><span class="text-sm">${fd(x[0])}, ${x[1]} hadir</span><b class="text-sm">${rp(x[2])}</b></div>`).join('')||empty('Belum ada absensi.')}</section>`:''}`;
 };
 function rekapAbsen(){const m={};db.TRX_ABSEN.forEach(x=>{m[x.tanggal]=m[x.tanggal]||[x.tanggal,0,0];if(x.hadir==='Ya')m[x.tanggal][1]++;m[x.tanggal][2]+=num(x.total_upah_hari_ini)});return Object.values(m).sort((a,b)=>b[0].localeCompare(a[0]))}
 A.absen=()=>{if(db.DB_PEKERJA.length)absUpd(1)};

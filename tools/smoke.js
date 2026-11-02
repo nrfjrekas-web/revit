@@ -102,3 +102,23 @@ run('ask=async()=>true');
  await run("loginRemote('2222')");
  ok('login perangkat baru: PIN benar mengambil data dan masuk sesuai peran',run("user.role")==='mandor'&&run("C().nama_sekolah")==='SD Remote'&&run("C().gas_ver")===7&&run("C().gas_token")===''&&run("myPin()")==='2222'&&els.main.hidden===false);
 })();
+
+// ===== Peran Bendahara: PIN, tugas, pengeluaran lain, laporan keuangan harian/mingguan/bulanan =====
+(async()=>{
+ await new Promise(r=>setTimeout(r,800));
+ const fo=o=>({preventDefault(){},target:Object.fromEntries(Object.entries(o).map(([k,v])=>[k,{value:v}]))});ctx.fo=fo;
+ run("ls.del(K+'_u');db=JSON.parse(JSON.stringify(SEED));Object.assign(db.CONFIG,{nama_sekolah:'SD Bend',pin_sekretaris:'1111',pin_mandor:'2222',pin_kepsek:'3333',pin_bendahara:'4444',nama_bendahara:'Bu Dewi',tgl_mulai:'2026-11-02'});user=null;pin=''");
+ '4444'.split('').forEach(k=>run(`pressPin('${k}')`));
+ ok('PIN bendahara: masuk sebagai Bendahara, halaman awal Tugas',run("user&&user.role")==='bend'&&els.view.dataset.p==='tugas');
+ ok('bendahara punya menu kas, barang masuk, absensi, stok, laporan',run("ROLES.bend.pages.join()")==='tugas,dash,kas,masuk,absen,stok,laporan');
+ run("db.TRX_KEUANGAN.push({tanggal:'2026-11-03',uraian:'Pencairan dana Tahap 1',kas_masuk:1000000,kas_keluar:0,saldo:0,sumber:'Pencairan',bukti_url:''},{tanggal:'2026-11-04',uraian:'Belanja Semen 10 sak, nota 7',kas_masuk:0,kas_keluar:200000,saldo:0,sumber:'Material',bukti_url:''});commit()");
+ run("subKasx(fo({kat:'ATK',tgl:'2026-11-04',ur:'Kertas laporan',jml:'150000'}))");
+ ok('pengeluaran lain masuk BKU dengan saldo benar',run("db.TRX_KEUANGAN.some(x=>x.sumber==='Pengeluaran'&&x.uraian==='ATK: Kertas laporan'&&x.kas_keluar===150000)")&&run("saldo()")===650000);
+ const harian=run("lapKeu('kd','2026-11-04')"),minggu=run("lapKeu('km',1)"),bulan=run("lapKeu('kb','2026-11')");
+ ok('laporan harian: saldo awal 1.000.000, pengeluaran 350.000, saldo akhir 650.000',harian.includes('1.000.000')&&harian.includes('350.000')&&harian.includes('650.000')&&harian.includes('Bu Dewi')&&harian.includes('HARIAN'));
+ ok('laporan mingguan dan bulanan memuat seluruh transaksi',minggu.includes('MINGGUAN KE-1')&&minggu.includes('Pencairan dana')&&bulan.includes('BULANAN')&&bulan.includes('November 2026'));
+ ok('laporan keuangan bebas NaN dan undefined',![harian,minggu,bulan].some(h=>/NaN|undefined/.test(h)));
+ ok('halaman Tugas dan Laporan memuat laporan keuangan tanpa galat',!/NaN|undefined/.test(run("V.tugas()"))&&run("V.laporan()").includes('Laporan keuangan'));
+ run("subPin(fo({sekretaris:'1111',mandor:'2222',kepsek:'3333',bendahara:'1111'}))");
+ ok('PIN bendahara kembar dengan peran lain ditolak',els.toast.textContent.includes('berbeda')&&run("C().pin_bendahara")==='4444');
+})();

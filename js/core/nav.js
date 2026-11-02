@@ -14,7 +14,7 @@ function go(p){
 /* Sidebar desktop: semua halaman milik peran, tanpa perlu halaman Menu */
 function sideBuild(p){
  const R=ROLES[user.role],cur=/^set\d$/.test(p)?'setting':p==='mingguan'?'laporan':p,sch=String(C().nama_sekolah||'').replace('UPTD Satuan Pendidikan ','');
- $('side').innerHTML=`<div class="sd-brand"><b>SI-REVITPro</b><span>${esc(sch)}</span></div><div class="sd-list">${R.pages.map(n=>`<button class="sd" onclick="go('${n}')" ${n===cur?'aria-current="page"':''}>${ic(n)}<span>${PG[n]}</span></button>`).join('')}</div><p class="sd-foot">Program Revitalisasi Satuan Pendidikan</p>`;
+ $('side').innerHTML=`<div class="sd-brand"><b>SI-REVITAL LITE</b><span>${esc(sch)}</span></div><div class="sd-list">${R.pages.map(n=>`<button class="sd" onclick="go('${n}')" ${n===cur?'aria-current="page"':''}>${ic(n)}<span>${PG[n]}</span></button>`).join('')}</div><p class="sd-foot">Program Revitalisasi Satuan Pendidikan SD, Swakelola P2SP</p>`;
 }
 
 /* ===== KOMPONEN KECIL ===== */

@@ -1,0 +1,14 @@
+/* ===== TUGAS BENDAHARA ===== */
+const TG=(t,d,ok,act,x)=>`<button class="rw !items-center" style="min-height:72px;border-top-width:${x?1:0}px" onclick="${act}">${ic('tugas')}<span class="flex-1">${t}<br><span class="mu text-xs font-normal">${d}</span></span>${ok===null?ic('chev'):`<span class="st ${ok?'ok':'wn'} whitespace-nowrap">${ok?'Aman':'Perlu dicek'}</span>`}</button>`;
+V.tugas=()=>{
+ const t=today(),kt=db.TRX_KEUANGAN.filter(x=>x.tanggal===t),m=sum(kt,'kas_masuk'),k=sum(kt,'kas_keluar'),bm=db.TRX_MASUK.filter(x=>x.tanggal===t),tanpa=db.TRX_MASUK.filter(x=>!x.foto_nota_url).length,ab=rekapAbsen().find(x=>x[0]===t),cair=sum(db.TRX_KEUANGAN.filter(x=>x.sumber==='Pencairan'),'kas_masuk'),lain=kt.filter(x=>x.sumber==='Pengeluaran').length,wk=mingguKe();
+ return `<section class="pn"><p class="mu text-sm">Saldo kas saat ini</p><p class="text-3xl font-extrabold ${saldo()<0?'bd':''}">${rp(saldo())}</p>
+ <div class="flex justify-between mt-3 text-sm"><span class="mu">Masuk hari ini</span><b class="ok">${rp(m)}</b></div><div class="flex justify-between mt-1 text-sm"><span class="mu">Keluar hari ini</span><b>${rp(k)}</b></div></section>
+ ${H2('Tugas hari ini')}
+ <section class="pn !py-0">${TG('Pencairan dana',cair?'Total dicairkan '+rp(cair):'Belum ada pencairan. Catat saat dana masuk.',!!cair,"go('kas')",0)}${TG('Cek nota dan foto belanja',`Hari ini ${bm.length} belanja, ${rp(sum(bm,'total_harga'))}. ${tanpa} belanja belum ada foto nota.`,tanpa===0,"go('masuk')",1)}${TG('Upah pekerja hari ini',ab?ab[1]+' hadir, upah '+rp(ab[2]):'Absensi hari ini belum dicatat, upah belum masuk BKU.',!!ab,"go('absen')",1)}${TG('Pengeluaran lain',lain+' pengeluaran lain tercatat hari ini',null,"go('kas')",1)}${TG('Saldo kas',saldo()<0?'Saldo minus, periksa pencairan dan pengeluaran.':'Saldo cukup dan sesuai BKU',saldo()>=0,"go('kas')",1)}</section>
+ ${H2('Laporan keuangan')}
+ <section class="pn !py-0">${LR('laporan','Laporan harian','Hari ini, '+fd(t),"cetak('kd','"+t+"')",0)}${LR('laporan','Laporan mingguan','Minggu ke-'+wk,"cetak('km',"+wk+")",1)}${LR('laporan','Laporan bulanan','Bulan '+t.slice(0,7),"cetak('kb','"+t.slice(0,7)+"')",1)}</section>
+ <p class="mu text-xs mt-2">Pilih tanggal, minggu, atau bulan lain di halaman Laporan dan cetak.</p>
+ ${H2('Tugas rutin bendahara')}
+ <section class="pn text-sm"><p class="font-bold">Setiap hari</p><p class="mu mb-3">Cek nota dan foto barang masuk, catat pembayaran dan pengeluaran lain, pastikan upah harian tercatat, lalu cetak laporan keuangan harian.</p><p class="font-bold">Setiap minggu</p><p class="mu mb-3">Cocokkan saldo kas dengan BKU dan uang di tangan, lalu cetak laporan mingguan untuk Kepala Sekolah.</p><p class="font-bold">Setiap bulan</p><p class="mu">Rekap seluruh pengeluaran, cetak laporan bulanan, dan arsipkan nota asli bersama laporannya.</p></section>`;
+};
