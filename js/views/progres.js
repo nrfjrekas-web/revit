@@ -8,9 +8,8 @@ V.progres=()=>{
   ${F('Cuaca','<select class="in" name="cuaca"><option>Cerah</option><option>Berawan</option><option>Hujan ringan</option><option>Hujan deras</option></select>')}
   ${F('Kendala','<textarea class="in" name="ken" placeholder="Kosongkan jika tidak ada"></textarea>')}
   ${F('Kebutuhan besok','<textarea class="in" name="beso" placeholder="Material, alat, atau tenaga"></textarea>')}
-  ${F('Foto dokumentasi: kondisi awal (0%)','<input class="in" type="file" name="f1" accept="image/*" capture="environment">')}
-  ${F('Foto dokumentasi: proses','<input class="in" type="file" name="f2" accept="image/*" capture="environment">')}
-  ${F('Foto dokumentasi: selesai','<input class="in" type="file" name="f3" accept="image/*" capture="environment">')}
+  ${F('Foto Before (kondisi sebelum dikerjakan)','<input class="in" type="file" name="f1" accept="image/*" capture="environment">','Disimpan di folder Progres Before.')}
+  ${F('Foto After (kondisi sesudah dikerjakan)','<input class="in" type="file" name="f3" accept="image/*" capture="environment">','Disimpan di folder Progres After.')}
   <button class="btn" id="pb">Simpan progres</button>
  </form>
  ${H2('Laporan terakhir')}
@@ -23,8 +22,8 @@ async function subProgres(e){
  e.preventDefault();const f=e.target,r=rab(f.rab.value),p=num(f.p.value),ed=EDIT&&EDIT.k==='progres'?EDIT.i:-1,o=ed>=0?db.TRX_PROGRES[ed]:null,k=sumP(r.id_rab,ed);
  if(p<=0)return toast('Kemajuan harus lebih dari 0.','err');
  if(k+p>100.0001){$('perr').textContent=`Melebihi 100%. Maksimal ${fmt(100-k)}%.`;return}
- $('pb').disabled=true;const fo=await Promise.all([f.f1,f.f2,f.f3].map(i=>img(i.files[0])));
- const rec={tanggal:f.tgl.value,cuaca:f.cuaca.value,id_rab:r.id_rab,pekerjaan:r.uraian_pekerjaan,persen_hari_ini:p,persen_kumulatif:k+p,kendala:f.ken.value,kebutuhan_besok:f.beso.value,foto1_url:fo[0]||(o?o.foto1_url:''),foto2_url:fo[1]||(o?o.foto2_url:''),foto3_url:fo[2]||(o?o.foto3_url:''),input_oleh:user.nama};
+ $('pb').disabled=true;const fo=await Promise.all([f.f1,f.f3].map(i=>img(i.files[0])));
+ const rec={tanggal:f.tgl.value,cuaca:f.cuaca.value,id_rab:r.id_rab,pekerjaan:r.uraian_pekerjaan,persen_hari_ini:p,persen_kumulatif:k+p,kendala:f.ken.value,kebutuhan_besok:f.beso.value,foto1_url:fo[0]||(o?o.foto1_url:''),foto3_url:fo[1]||(o?o.foto3_url:''),foto2_url:o&&o.foto2_url?o.foto2_url:'',input_oleh:user.nama};
  if(o)db.TRX_PROGRES[ed]=rec;else db.TRX_PROGRES.push(rec);recumul();
  log(o?'Ubah progres harian':'Progres harian',`${r.id_rab} ${fmt(p)}%`);EDIT=null;commit();toast(o?'Perubahan disimpan.':'Progres disimpan.');go('progres');
 }

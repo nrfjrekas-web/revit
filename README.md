@@ -35,7 +35,8 @@ Mulai lebar 1024 px (`@media (min-width:1024px)` di akhir `css/style.css`), tamp
 
 ## Foto
 - Barang masuk wajib dua foto terpisah: nota (`foto_nota_url`) dan barang yang diterima (`foto_barang_url`). Saat Ubah, foto lama dipakai bila tidak diganti.
-- Dokumentasi progres (`foto1_url`, `foto2_url`, `foto3_url`) dan dokumentasi absen (`foto_absen_url`) tetap kolom tersendiri.
+- Dokumentasi progres kini dua foto: Before (`foto1_url`) dan After (`foto3_url`); `foto2_url` hanya sisa data lama dan dokumentasi absen (`foto_absen_url`) tetap kolom tersendiri.
+- Di Google Drive, backend memisahkan foto ke subfolder `SI-REVITAL/Nota`, `Barang`, `Progres Before`, `Progres After`, dan `Lainnya` (absen). Foto lama dirapikan dengan menjalankan `rapikanFoto()` sekali di editor Apps Script.
 - Pratinjau foto nota dan barang tampil di daftar Barang masuk; ketuk untuk memperbesar (`lihatFoto` di `core/util.js`).
 
 ## Data awal

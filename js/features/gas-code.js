@@ -4,7 +4,7 @@ const GAS=`// SI-REVITAL LITE - Backend Google Apps Script (v2)
 // 2) Jalankan fungsi izinkan() sekali, setujui izin Drive dan Sheet.
 // 3) Deploy > Aplikasi web: jalankan sebagai Saya, akses Siapa saja.
 
-const TOKEN = 'GANTI-DENGAN-KATA-RAHASIA';
+const TOKEN = '3388932Fajar5557';
 const FOLDER = 'SI-REVITAL';
 const TABLES = ['CONFIG', 'DB_RAB', 'DB_MATERIAL', 'DB_PEKERJA', 'TRX_MASUK', 'TRX_KELUAR', 'TRX_PROGRES', 'TRX_ABSEN', 'TRX_KEUANGAN', 'LOG_AKTIVITAS'];
 const TEXT_COLS = ['no_nota', 'supplier', 'nip_kepsek', 'kode_desa', 'tahun_anggaran', 'pin_sekretaris', 'pin_mandor', 'pin_kepsek'];
@@ -142,11 +142,55 @@ function getFolder() {
   return folderCache;
 }
 
+const F_NOTA = 'Nota';
+const F_BARANG = 'Barang';
+const F_BEFORE = 'Progres Before';
+const F_AFTER = 'Progres After';
+const F_LAIN = 'Lainnya';
+let subCache = {};
+
+function subFolder(nama) {
+  if (subCache[nama]) return subCache[nama];
+  const root = getFolder();
+  const it = root.getFoldersByName(nama);
+  subCache[nama] = it.hasNext() ? it.next() : root.createFolder(nama);
+  return subCache[nama];
+}
+
+// Pilih folder dari nama kolom foto. Absen dan foto proses lama masuk Lainnya.
+function folderFoto(tag) {
+  if (tag.indexOf('foto_nota') >= 0) return subFolder(F_NOTA);
+  if (tag.indexOf('foto_barang') >= 0) return subFolder(F_BARANG);
+  if (tag.indexOf('foto1') >= 0) return subFolder(F_BEFORE);
+  if (tag.indexOf('foto3') >= 0) return subFolder(F_AFTER);
+  return subFolder(F_LAIN);
+}
+
+// Jalankan SEKALI dari editor Apps Script: merapikan foto lama dari folder utama dan folder Progres lama.
+function rapikanFoto() {
+  const list = [];
+  const kumpul = folder => {
+    const it = folder.getFiles();
+    while (it.hasNext()) list.push(it.next());
+  };
+  kumpul(getFolder());
+  const lama = getFolder().getFoldersByName('Progres');
+  if (lama.hasNext()) kumpul(lama.next());
+  let n = 0;
+  list.forEach(f => {
+    const nm = f.getName();
+    if (nm.indexOf('.jpg') < 0 || nm.indexOf('_foto') < 0) return;
+    f.moveTo(folderFoto(nm));
+    n++;
+  });
+  return n + ' foto dipindahkan';
+}
+
 function photo(v, tag) {
   const bytes = Utilities.base64Decode(v.substring(v.indexOf(',') + 1));
   const hash = Utilities.base64EncodeWebSafe(Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, bytes)).substring(0, 10);
   const name = tag + '_' + hash + '.jpg';
-  const folder = getFolder();
+  const folder = folderFoto(tag);
   const it = folder.getFilesByName(name);
   const f = it.hasNext() ? it.next() : folder.createFile(Utilities.newBlob(bytes, 'image/jpeg', name));
   f.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
