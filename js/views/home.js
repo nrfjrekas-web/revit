@@ -11,7 +11,7 @@ V.dash=()=>{
  const f=fisik(),sr=keluarKas(),pc=totalRab()?sr/totalRab()*100:0,k=kritis(),lg=db.LOG_AKTIVITAS.slice(-5).reverse();
  return `${mulai()}
  <div class="dg">
- <section class="text-white rounded-md p-4 dg-hero" style="background:var(--navy)">
+ <section class="text-white rounded-md p-4 dg-hero" >
   <p class="text-sm opacity-80">Progres fisik kumulatif</p>
   <p class="text-[56px] font-extrabold leading-none mt-1" style="font-stretch:80%">${fmt(f)}<span class="text-2xl font-semibold">%</span></p>
   <div class="mt-3">${bar(f)}</div>

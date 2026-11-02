@@ -35,3 +35,13 @@ Mulai lebar 1024 px (`@media (min-width:1024px)` di akhir `css/style.css`), tamp
 
 ## Data awal
 Aplikasi mulai benar-benar kosong: tidak ada identitas sekolah, pejabat, PIN, RAB, material, maupun pekerja bawaan. Saat pertama dibuka (belum ada PIN) tampil layar **Pengaturan awal**: identitas sekolah, baris atas kop dan kota tanda tangan, tahun anggaran, tanggal mulai (wajib), nama pejabat (boleh kosong), dan tiga PIN 4 angka yang berbeda. Perangkat baru dapat memilih "Ambil data dari Google Sheet" di layar yang sama. Setelah itu Beranda menampilkan panel "Mulai di sini" sampai RAB, material, dan pekerja terisi. Total RAB 0 berarti dihitung otomatis dari jumlah item RAB.
+
+
+## Login langsung dengan PIN (tanpa mengetik URL Apps Script)
+
+1. Pasang `backend/Code.gs` versi terbaru di Apps Script, deploy ulang sebagai versi baru.
+2. Buka `js/core/config.js`, isi `GAS_URL` dengan URL Web App (berakhiran `/exec`), lalu push dan deploy ulang.
+3. Dari perangkat utama, kirim data pertama kali lewat Pengaturan dengan kata sandi admin (TOKEN). Ini hanya sekali.
+4. Setelah itu perangkat mana pun cukup memasukkan PIN. Server memeriksa PIN, lalu mengirim data sesuai peran. Sinkron otomatis memakai PIN yang sama, tanpa token.
+
+Keamanan: URL Web App bersifat publik, tetapi data hanya dikirim bila PIN benar. Sepuluh PIN salah berturut-turut mengunci login PIN selama 15 menit. TOKEN admin tidak ditaruh di kode aplikasi.

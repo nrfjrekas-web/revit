@@ -20,7 +20,7 @@ run(order.map(p=>fs.readFileSync(root+'/'+p,'utf8')).join('\n'));
 const ok=(n,c)=>console.log((c?'LULUS  ':'GAGAL  ')+n);
 const ev=(o)=>({preventDefault(){},target:{__data:o}});
 ctx.ev=ev;ctx.els=els;ctx.store=store;
-ok('pertama dibuka: layar pengaturan awal tampil, login tersembunyi',els.setup.hidden===false&&els.setup.innerHTML.includes('Pengaturan awal')&&els.login.hidden===true);
+ok('pertama dibuka: tanpa PIN lokal, tampil papan PIN bila GAS_URL terisi, bila tidak pengaturan awal',run("!!GAS_URL")?(els.login.hidden===false&&els.setup.hidden===true):(els.setup.hidden===false&&els.setup.innerHTML.includes('Pengaturan awal')&&els.login.hidden===true));
 ok('tidak ada PIN/identitas bawaan',run("!C().pin_sekretaris&&!C().nama_sekolah&&!C().tgl_mulai"));
 run(`subSetup(ev({nama_sekolah:'SD Uji',tgl_mulai:'2026-11-02',pin_sekretaris:'1111',pin_mandor:'1111',pin_kepsek:'3333'}))`);
 ok('PIN kembar ditolak',els.toast.textContent.includes('berbeda')&&!run('C().pin_sekretaris'));
@@ -52,7 +52,7 @@ ok('kop tanpa baris atas bila tidak diisi; kota tanda tangan dari pengaturan',r.
 (async()=>{
  run('ask=async()=>true');
  await run('resetData()');
- ok('hapus data: kembali ke pengaturan awal, PIN lama tidak berlaku',els.setup.hidden===false&&els.login.hidden===true&&run("!C().pin_sekretaris")&&!store.sirevital_v2_u);
+ ok('hapus data: kembali ke pengaturan awal, PIN lama tidak berlaku',(run("!!GAS_URL")?(els.login.hidden===false&&els.setup.hidden===true):(els.setup.hidden===false&&els.login.hidden===true))&&run("!C().pin_sekretaris")&&!store.sirevital_v2_u);
  el('sgas').value='https://x/exec';el('stok').value='tok';
  await run('pullAwal()');
  ok('perangkat baru: tarik dari Sheet lalu tampil layar PIN',els.login.hidden===false&&els.setup.hidden===true&&run("C().nama_sekolah==='SD Contoh'&&C().gas_url==='https://x/exec'&&C().gas_ver===4"));
@@ -76,4 +76,20 @@ ok('kop tanpa baris atas bila tidak diisi; kota tanda tangan dari pengaturan',r.
  ok('tarik otomatis dilewati bila versi Sheet sama',calls.length===1&&calls[0].u.includes('action=ver'));
  run("user={role:Object.keys(ROLES)[0],nama:'t'}");run("syToggle()");run("commit()");
  ok('matikan sinkron otomatis: perubahan tidak dikirim sendiri',run("ls.get(K+'_auto')")==='0'&&run("syOn()")===false);
+})();
+
+// ===== Login PIN perangkat baru (tanpa mengetik URL/token) =====
+(async()=>{
+ await new Promise(r=>setTimeout(r,400));
+ const reset=()=>run("ls.del(K);ls.del(K+'_u');ls.del(K+'_lp');db=JSON.parse(JSON.stringify(SEED));user=null;pin=''");
+ const resp=o=>{ctx.fetch=async()=>({json:async()=>o})};
+ reset();resp({error:'pin'});await run("loginRemote('9999')");
+ ok('login perangkat baru: PIN salah ditolak server',els.pinErr.textContent.includes('PIN salah')&&run("user")===null);
+ reset();resp({error:'lock'});await run("loginRemote('9999')");
+ ok('login perangkat baru: terkunci setelah terlalu banyak PIN salah',els.pinErr.textContent.includes('15 menit'));
+ reset();resp({error:'kosong'});await run("loginRemote('1111')");
+ ok('login perangkat baru: Sheet kosong membuka pengaturan awal',els.setup.hidden===false&&els.login.hidden===true);
+ reset();resp({role:'mandor',ver:7,CONFIG:{nama_sekolah:'SD Remote',pin_sekretaris:'1111',pin_mandor:'2222',pin_kepsek:'3333'},DB_RAB:[]});
+ await run("loginRemote('2222')");
+ ok('login perangkat baru: PIN benar mengambil data dan masuk sesuai peran',run("user.role")==='mandor'&&run("C().nama_sekolah")==='SD Remote'&&run("C().gas_ver")===7&&run("C().gas_token")===''&&run("myPin()")==='2222'&&els.main.hidden===false);
 })();

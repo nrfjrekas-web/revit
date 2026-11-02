@@ -14,10 +14,23 @@ function pressPin(k){
  if(k==='<')pin=pin.slice(0,-1);else if(pin.length<4)pin+=k;
  drawPin();
  if(pin.length===4){
+  if(!C().pin_sekretaris){loginRemote(pin);return}
   const c=C(),m={[String(c.pin_sekretaris)]:'sek',[String(c.pin_mandor)]:'mandor',[String(c.pin_kepsek)]:'kepsek'}[pin];
   if(!m){$('pinErr').textContent='PIN salah. Periksa lalu coba lagi.';pin='';drawPin();return}
-  user={role:m,nama:ROLES[m].nama};ls.set(K+'_u',m);pin='';enter();
+  user={role:m,nama:ROLES[m].nama};ls.set(K+'_u',m);ls.set(K+'_lp',pin);pin='';enter();
  }
+}
+/* Perangkat baru: PIN diperiksa server Apps Script; bila benar, data proyek ikut diambil. */
+async function loginRemote(p){
+ const e=$('pinErr'),u=GAS_URL;e.textContent='Memeriksa PIN...';e.className='lgerr mu';
+ const bad=m=>{e.textContent=m;e.className='lgerr bd';pin='';drawPin()};
+ try{
+  const r=await(await fetch(u+(u.indexOf('?')<0?'?':'&')+'action=login&pin='+encodeURIComponent(p))).json();
+  if(r.error==='kosong'){pin='';drawPin();e.textContent='';$('login').hidden=true;showSetup();return toast('Sheet masih kosong. Lakukan pengaturan awal.')}
+  if(r.error)return bad(r.error==='lock'?'Terlalu banyak PIN salah. Coba lagi 15 menit lagi.':'PIN salah. Periksa lalu coba lagi.');
+  if(!r.CONFIG||!r.role||!ROLES[r.role])return bad('Data di Sheet belum lengkap. Hubungi Sekretaris.');
+  applyData(r,u,'');ls.set(K+'_lp',p);user={role:r.role,nama:ROLES[r.role].nama};ls.set(K+'_u',r.role);pin='';e.textContent='';drawPin();enter()
+ }catch(x){bad('Tidak bisa menghubungi server. Periksa internet.')}
 }
 function enter(){
  $('login').hidden=true;$('main').hidden=false;

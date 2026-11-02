@@ -1,23 +1,29 @@
 /* Sinkronisasi Google Sheet: kirim (push) dan tarik (pull). Backend: backend/Code.gs */
-function gasCfg(){const u=$('gas').value.trim(),t=$('gtok').value.trim();if(!u||!t){toast('Isi URL Web App dan kata sandi sinkron.','err');return null}db.CONFIG.gas_url=u;db.CONFIG.gas_token=t;return{u,t}}
-async function push(force){const g=gasCfg();if(!g)return;clearTimeout(SY.t);commit();try{const cfg=Object.assign({},db.CONFIG);delete cfg.gas_url;delete cfg.gas_token;delete cfg.gas_ver;const data=Object.assign({},db,{CONFIG:cfg});const r=await(await fetch(g.u,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({token:g.t,base:num(db.CONFIG.gas_ver),force:!!force,data})})).json();
- if(r.error)return toast(r.error==='token'?'Kata sandi sinkron salah.':'Server sibuk atau format salah, coba lagi.','err');
- if(r.conflict){if(await ask('Data di Google Sheet lebih baru (diubah dari perangkat lain). Timpa dengan data perangkat ini? Bila tidak, tekan Tarik dari Sheet untuk mengambil data terbaru.'))return push(true);return}
- (r.photos||[]).forEach(p=>{const row=db[p.t]&&db[p.t][p.i];if(row&&String(row[p.c]).indexOf('data:image')===0)row[p.c]=p.url});
- db.CONFIG.gas_ver=r.ver;SY.applying=true;commit();SY.applying=false;ls.del(K+'_dirty');SY.askd=false;syStat('Tersinkron '+jam());toast('Data terkirim ke Sheet (versi '+r.ver+').');go(page)}catch(e){toast('Gagal mengirim: '+e.message,'err')}}
-async function tarik(u,t,guard){const d=await(await fetch(u+(u.indexOf('?')<0?'?':'&')+'action=pull&token='+encodeURIComponent(t))).json();
- if(d.error)throw new Error(d.error==='token'?'kata sandi sinkron salah':d.error);
- if(!d.CONFIG)throw new Error('Sheet masih kosong. Kirim data dulu dari perangkat utama.');
- if(guard&&guard())throw new Error('batal');
+const gasUrl=()=>db.CONFIG.gas_url||GAS_URL;
+const myPin=()=>ls.get(K+'_lp')||'';
+const rolePin=()=>user&&C()['pin_'+{sek:'sekretaris',mandor:'mandor',kepsek:'kepsek'}[user.role]]||'';
+const syPin=()=>{const p=rolePin();if(p)ls.set(K+'_lp',String(p))};
+function applyData(d,u,t){
  Object.keys(SEED).forEach(k=>{if(d[k]!==undefined)db[k]=Array.isArray(SEED[k])?d[k]:Object.assign({},SEED[k],d[k])});
  Object.assign(db.CONFIG,{gas_url:u,gas_token:t,gas_ver:d.ver});SY.applying=true;commit();SY.applying=false;ls.del(K+'_dirty')}
+function gasCfg(){const u=$('gas').value.trim()||GAS_URL,t=$('gtok').value.trim();if(!u||(!t&&!myPin())){toast('Isi URL Web App dan kata sandi sinkron.','err');return null}db.CONFIG.gas_url=u;db.CONFIG.gas_token=t;return{u,t}}
+async function push(force){const g=gasCfg();if(!g)return;clearTimeout(SY.t);commit();try{const cfg=Object.assign({},db.CONFIG);delete cfg.gas_url;delete cfg.gas_token;delete cfg.gas_ver;const data=Object.assign({},db,{CONFIG:cfg});const r=await(await fetch(g.u,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({token:g.t,pin:myPin(),base:num(db.CONFIG.gas_ver),force:!!force,data})})).json();
+ if(r.error)return toast(r.error==='lock'?'Terlalu banyak PIN salah. Coba lagi 15 menit lagi.':r.error==='token'||r.error==='pin'?'Akses ditolak. Pengiriman pertama ke Sheet kosong butuh kata sandi admin.':'Server sibuk atau format salah, coba lagi.','err');
+ if(r.conflict){if(await ask('Data di Google Sheet lebih baru (diubah dari perangkat lain). Timpa dengan data perangkat ini? Bila tidak, tekan Tarik dari Sheet untuk mengambil data terbaru.'))return push(true);return}
+ (r.photos||[]).forEach(p=>{const row=db[p.t]&&db[p.t][p.i];if(row&&String(row[p.c]).indexOf('data:image')===0)row[p.c]=p.url});
+ db.CONFIG.gas_ver=r.ver;SY.applying=true;commit();SY.applying=false;ls.del(K+'_dirty');SY.askd=false;syPin();syStat('Tersinkron '+jam());toast('Data terkirim ke Sheet (versi '+r.ver+').');go(page)}catch(e){toast('Gagal mengirim: '+e.message,'err')}}
+async function tarik(u,t,guard){const d=await(await fetch(u+(u.indexOf('?')<0?'?':'&')+'action=pull&token='+encodeURIComponent(t)+'&pin='+encodeURIComponent(myPin()))).json();
+ if(d.error)throw new Error(d.error==='token'||d.error==='pin'?'akses ditolak (kata sandi atau PIN salah)':d.error==='lock'?'terlalu banyak PIN salah, coba lagi 15 menit lagi':d.error);
+ if(!d.CONFIG)throw new Error('Sheet masih kosong. Kirim data dulu dari perangkat utama.');
+ if(guard&&guard())throw new Error('batal');
+ applyData(d,u,t);syPin()}
 async function pull(){const g=gasCfg();if(!g)return;if(!(await ask('Data di perangkat akan diganti dengan data dari Google Sheet. Lanjutkan?')))return;try{clearTimeout(SY.t);await tarik(g.u,g.t);SY.askd=false;syStat('Tersinkron '+jam());toast('Data ditarik dari Sheet.');go(page)}catch(e){toast('Gagal menarik data: '+e.message,'err')}}
 async function pullAwal(){const u=$('sgas').value.trim(),t=$('stok').value.trim();if(!u||!t)return toast('Isi URL Web App dan kata sandi sinkron.','err');try{await tarik(u,t);if(!C().pin_sekretaris)throw new Error('data di Sheet belum memuat PIN');toast('Data ditarik dari Sheet.');boot()}catch(e){toast('Gagal menarik data: '+e.message,'err')}}
 
 /* ===== Sinkron otomatis: kirim setelah ada perubahan, tarik berkala bila Sheet lebih baru ===== */
 const SY={t:null,busy:false,applying:false,seq:0,askd:false,stat:''};
 const jam=()=>new Date().toTimeString().slice(0,5);
-const syCfg=()=>!!(db&&db.CONFIG&&db.CONFIG.gas_url&&db.CONFIG.gas_token);
+const syCfg=()=>!!(db&&db.CONFIG&&gasUrl()&&(db.CONFIG.gas_token||myPin()));
 const syOn=()=>syCfg()&&ls.get(K+'_auto')!=='0';
 const syDirty=()=>ls.get(K+'_dirty')==='1';
 const syOffline=()=>typeof navigator!=='undefined'&&navigator.onLine===false;
@@ -32,14 +38,14 @@ async function syPush(force){
  try{
   const c=db.CONFIG,cfg=Object.assign({},c);delete cfg.gas_url;delete cfg.gas_token;delete cfg.gas_ver;
   const data=Object.assign({},db,{CONFIG:cfg});
-  const r=await(await fetch(c.gas_url,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({token:c.gas_token,base:num(c.gas_ver),force:force===true,data})})).json();
-  if(r.error){syStat(r.error==='token'?'Kata sandi sinkron salah.':'Server sibuk, dicoba lagi.');if(r.error!=='token')SY.t=setTimeout(syPush,30000);return}
+  const r=await(await fetch(gasUrl(),{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({token:c.gas_token||'',pin:myPin(),base:num(c.gas_ver),force:force===true,data})})).json();
+  if(r.error){const x=r.error==='token'||r.error==='pin'||r.error==='lock';syStat(r.error==='lock'?'PIN terkunci sementara.':x?'Akses ditolak. Kirim pertama kali lewat Pengaturan dengan kata sandi admin.':'Server sibuk, dicoba lagi.');if(!x)SY.t=setTimeout(syPush,30000);return}
   if(r.conflict){syStat('Konflik: Sheet lebih baru dari perangkat ini.');
    if(!SY.askd){SY.askd=true;SY.busy=false;if(await ask('Data di Google Sheet lebih baru (diubah dari perangkat lain). Timpa dengan data perangkat ini? Bila tidak, buka Pengaturan lalu tekan Tarik dari Sheet.'))return syPush(true)}
    return}
   (r.photos||[]).forEach(p=>{const row=db[p.t]&&db[p.t][p.i];if(row&&String(row[p.c]).indexOf('data:image')===0)row[p.c]=p.url});
   db.CONFIG.gas_ver=r.ver;SY.applying=true;commit();SY.applying=false;SY.askd=false;
-  if(SY.seq===seq){ls.del(K+'_dirty');syStat('Tersinkron '+jam())}else{SY.t=setTimeout(syPush,1500)}
+  syPin();if(SY.seq===seq){ls.del(K+'_dirty');syStat('Tersinkron '+jam())}else{SY.t=setTimeout(syPush,1500)}
  }catch(e){SY.applying=false;syStat('Gagal kirim, dicoba lagi otomatis.');SY.t=setTimeout(syPush,30000)}
  finally{SY.busy=false}
 }
@@ -49,10 +55,10 @@ async function syPull(){
  SY.busy=true;const seq=SY.seq;
  try{
   const c=db.CONFIG;
-  const v=await(await fetch(c.gas_url+(c.gas_url.indexOf('?')<0?'?':'&')+'action=ver&token='+encodeURIComponent(c.gas_token))).json();
+  const u=gasUrl(),v=await(await fetch(u+(u.indexOf('?')<0?'?':'&')+'action=ver&token='+encodeURIComponent(c.gas_token||'')+'&pin='+encodeURIComponent(myPin()))).json();
   if(v.error||v.ver===undefined||num(v.ver)<=num(c.gas_ver))return;
   if(syEditing())return;
-  await tarik(c.gas_url,c.gas_token,()=>SY.seq!==seq||syDirty());
+  await tarik(u,c.gas_token||'',()=>SY.seq!==seq||syDirty());
   SY.askd=false;syStat('Diperbarui dari Sheet '+jam());toast('Data diperbarui dari perangkat lain.');
   if(user)go(page)
  }catch(e){if(e.message!=='batal')syStat('Gagal memeriksa Sheet.')}

@@ -26,12 +26,46 @@ function version() {
   return Number(PROP.getProperty('VER') || 0);
 }
 
+// Akses: kata sandi admin (TOKEN) atau PIN 4 angka milik salah satu peran yang tersimpan di sheet CONFIG.
+// Percobaan PIN salah dibatasi: 10 kali salah mengunci semua login PIN selama 15 menit.
+function readConfig() {
+  const sh = SS.getSheetByName('CONFIG');
+  const c = {};
+  if (sh && sh.getLastRow() > 1) sh.getRange(2, 1, sh.getLastRow() - 1, 2).getValues().forEach(r => { c[r[0]] = String(r[1]); });
+  return c;
+}
+
+function auth(token, pin) {
+  if (token && token === TOKEN) return 'admin';
+  if (!pin) return null;
+  if (Date.now() < Number(PROP.getProperty('LOCK') || 0)) return 'lock';
+  const c = readConfig();
+  if (!c.pin_sekretaris) return 'kosong';
+  const roles = { sek: c.pin_sekretaris, mandor: c.pin_mandor, kepsek: c.pin_kepsek };
+  const p = String(pin);
+  for (const r in roles) {
+    if (roles[r] && roles[r] === p) { PROP.deleteProperty('FAIL'); return r; }
+  }
+  const f = Number(PROP.getProperty('FAIL') || 0) + 1;
+  if (f >= 10) { PROP.setProperty('LOCK', String(Date.now() + 15 * 60000)); PROP.deleteProperty('FAIL'); }
+  else PROP.setProperty('FAIL', String(f));
+  return null;
+}
+
+function denied(a, token) {
+  if (a === 'lock') return out({ error: 'lock' });
+  if (a === 'kosong') return out({ error: 'kosong' });
+  return out({ error: token ? 'token' : 'pin' });
+}
+
 function doGet(e) {
   const p = (e && e.parameter) || {};
-  if (p.token !== TOKEN) return out({ error: 'token' });
+  const a = auth(p.token, p.pin);
+  if (!a || a === 'lock' || a === 'kosong') return denied(a, p.token);
   if (p.action === 'ver') return out({ ver: version() });
   const d = readAll();
   d.ver = version();
+  d.role = a;
   return out(d);
 }
 
@@ -42,7 +76,10 @@ function doPost(e) {
   } catch (x) {
     return out({ error: 'format' });
   }
-  if (req.token !== TOKEN || !req.data) return out({ error: req.token !== TOKEN ? 'token' : 'format' });
+  const a = auth(req.token, req.pin);
+  if (a === 'kosong') return out({ error: 'token' });
+  if (!a || a === 'lock') return denied(a, req.token);
+  if (!req.data) return out({ error: 'format' });
   const lock = LockService.getScriptLock();
   if (!lock.tryLock(25000)) return out({ error: 'sibuk' });
   try {
