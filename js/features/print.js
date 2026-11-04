@@ -23,7 +23,8 @@ function lapKeu(k,v){
  return doc(t,sub,`${TB(['Ringkasan kas','Jumlah (Rp)'],[['Saldo awal periode',fmt(awal)],['Penerimaan (pencairan dana)',fmt(masuk)],['Total pengeluaran',fmt(keluar)],['<b>Saldo akhir periode</b>','<b>'+fmt(akhir)+'</b>']],[1])}${h3('Pengeluaran menurut jenis')}${TB(['Jenis','Jumlah (Rp)'],per,[1])}${h3('Rincian transaksi kas')}${TB(['Tanggal','Uraian','Jenis','Masuk','Keluar','Saldo'],rows.map(x=>[fd(x.tanggal),esc(x.uraian),esc(SUMBER[x.sumber]||x.sumber),x.kas_masuk?fmt(x.kas_masuk):'',x.kas_keluar?fmt(x.kas_keluar):'',fmt(x.saldo)]),[3,4,5])}${h3('Belanja material dan nota')}${TB(['Tanggal','Material','Jumlah','Supplier','No. nota','Total (Rp)'],db.TRX_MASUK.filter(ir).map(x=>[fd(x.tanggal),esc(x.nama_material),fmt(x.qty)+' '+esc(x.satuan),esc(x.supplier||'-'),esc(x.no_nota||'-'),fmt(x.total_harga)]),[5])}${h3('Upah tenaga kerja')}${TB(['Tanggal','Pekerja hadir','Upah (Rp)'],rekapAbsen().filter(x=>x[0]>=a&&x[0]<=z).reverse().map(x=>[fd(x[0]),x[1],fmt(x[2])]),[1,2])}`,ttdKeu)}
 function cetak(k,wk){
  let h;
- if(k==='kd'||k==='km'||k==='kb'){if(!wk)return toast('Pilih tanggal, minggu, atau bulannya dulu.','err');h=lapKeu(k,wk)}else if(k==='bku')h=doc('BUKU KAS UMUM (BKU)','',tBku()+`<p style="margin-top:10px">Saldo akhir: <b>${rp(saldo())}</b></p>`);
+ if(k==='kd'||k==='km'||k==='kb')return cetakRevit({kd:'h',km:'m',kb:'b'}[k],wk);
+ else if(k==='bku')h=doc('BUKU KAS UMUM (BKU)','',tBku()+`<p style="margin-top:10px">Saldo akhir: <b>${rp(saldo())}</b></p>`);
  else if(k==='stok')h=doc('BERITA ACARA STOK OPNAME GUDANG','',`<p style="margin-bottom:8px">Pada hari ini ${longD(today())} telah dilakukan pemeriksaan stok material gudang dengan hasil:</p>${tStok()}`);
  else if(k==='mg'){
   const n=wk,a=addD(C().tgl_mulai,(n-1)*7),z=addD(a,6),ib=x=>x.tanggal>=a&&x.tanggal<=z;

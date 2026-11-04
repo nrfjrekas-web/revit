@@ -2,7 +2,7 @@ const LR=(i,t,d,k,x)=>`<button class="rw !items-center" style="min-height:72px;b
 V.laporan=()=>{
  const f=fisik(),st=p=>f>=p?'Progres sudah '+fmt(f)+'%, siap dibuat':'Belum tercapai, progres sekarang '+fmt(f)+'%';
  return `<p class="mu text-sm mb-4">Ketuk salah satu laporan untuk melihat pratinjau. Dari pratinjau, Anda bisa mencetak atau menyimpannya sebagai PDF.</p>
- <h2 class="text-[15px] font-bold mb-2">Laporan keuangan</h2>
+ <h2 class="text-[15px] font-bold mb-2">Laporan harian, mingguan, dan bulanan</h2>
  <section class="pn mb-6">${F('Harian: pilih tanggal',`<input class="in" type="date" id="kdt" value="${today()}">`)}<button class="btn alt mb-5" onclick="cetak('kd',$('kdt').value)">Lihat laporan harian</button>
  ${F('Mingguan: pilih minggu',`<select class="in" id="kmg">${Array.from({length:12},(_,i)=>`<option value="${i+1}" ${i+1===mingguKe()?'selected':''}>Minggu ${i+1}</option>`).join('')}</select>`)}<button class="btn alt mb-5" onclick="cetak('km',+$('kmg').value)">Lihat laporan mingguan</button>
  ${F('Bulanan: pilih bulan',`<input class="in" type="month" id="kbl" value="${today().slice(0,7)}">`)}<button class="btn alt" onclick="cetak('kb',$('kbl').value)">Lihat laporan bulanan</button></section>

@@ -121,7 +121,7 @@ run('ask=async()=>true');
  ok('laporan harian: saldo awal 1.000.000, pengeluaran 350.000, saldo akhir 650.000',harian.includes('1.000.000')&&harian.includes('350.000')&&harian.includes('650.000')&&harian.includes('Bu Dewi')&&harian.includes('HARIAN'));
  ok('laporan mingguan dan bulanan memuat seluruh transaksi',minggu.includes('MINGGUAN KE-1')&&minggu.includes('Pencairan dana')&&bulan.includes('BULANAN')&&bulan.includes('November 2026'));
  ok('laporan keuangan bebas NaN dan undefined',![harian,minggu,bulan].some(h=>/NaN|undefined/.test(h)));
- ok('halaman Tugas dan Laporan memuat laporan keuangan tanpa galat',!/NaN|undefined/.test(run("V.tugas()"))&&run("V.laporan()").includes('Laporan keuangan'));
+ ok('halaman Tugas dan Laporan memuat laporan harian, mingguan, bulanan tanpa galat',!/NaN|undefined/.test(run("V.tugas()"))&&run("V.laporan()").includes('Laporan harian, mingguan, dan bulanan'));
 run("db.CONFIG.npsn='30523505';db.CONFIG.kab_kota='JEMBER';db.CONFIG.provinsi='JAWA TIMUR';db.CONFIG.nama_p2sp='ABD. ROHIM';db.CONFIG.nama_pengawas='AMIRUL';db.CONFIG.no_pks='PKS/2026';db.CONFIG.tgl_pks='2026-07-27';db.CONFIG.dana_70=517660538");
  {const rv=[["h","2026-11-04"],["m",1],["b","2026-11"]].map(a=>run("cetakRevit('"+a[0]+"',"+JSON.stringify(a[1])+");$('print').innerHTML"));
  ok('Laporan Revit harian/mingguan/bulanan: kop program, NPSN, tanda tangan P2SP dan Pengawas, dokumentasi',rv.every(h=>h.includes('PROGRAM REVITALISASI')&&h.includes('30523505')&&h.includes('ABD. ROHIM')&&h.includes('DOKUMENTASI LAPORAN'))&&rv[0].includes('LAPORAN HARIAN')&&rv[1].includes('MINGGUAN KE-1')&&rv[2].includes('BULANAN'));
