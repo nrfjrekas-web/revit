@@ -5,7 +5,7 @@ const GAS_URL='https://script.google.com/macros/s/AKfycbymaFd9WHxUdWYH3KA33BteFp
 /* ===== DATA (struktur 9 sheet PRD; disimpan di localStorage, bisa disinkronkan ke Google Sheet) ===== */
 const K='sirevital_v2';
 const SEED={
- CONFIG:{nama_sekolah:'',alamat:'',kode_desa:'',kop_atas:'',kota_ttd:'',total_rab:0,nama_kepsek:'',nip_kepsek:'',nama_sekretaris:'',nama_mandor:'',nama_komite:'',nama_bendahara:'',npsn:'',kab_kota:'',provinsi:'',nama_p2sp:'',nama_pengawas:'',no_pks:'',tgl_pks:'',tgl_dana:'',dana_70:0,pin_sekretaris:'',pin_mandor:'',pin_kepsek:'',pin_bendahara:'',pin_operator:'',tahun_anggaran:'',tgl_mulai:'',gas_url:'',gas_token:'',gas_ver:0},
+ CONFIG:{nama_sekolah:'',alamat:'',kode_desa:'',kop_atas:'',kota_ttd:'',total_rab:0,nama_kepsek:'',nip_kepsek:'',nama_sekretaris:'',nama_mandor:'',nama_komite:'',nama_bendahara:'',npsn:'',kab_kota:'',provinsi:'',nama_p2sp:'',nama_pengawas:'',no_pks:'',tgl_pks:'',tgl_dana:'',dana_70:0,nilai_admin:0,pin_sekretaris:'',pin_mandor:'',pin_kepsek:'',pin_bendahara:'',pin_operator:'',tahun_anggaran:'',tgl_mulai:'',gas_url:'',gas_token:'',gas_ver:0},
  DB_RAB:[],DB_MATERIAL:[],DB_PEKERJA:[],
  TRX_MASUK:[],TRX_KELUAR:[],TRX_PROGRES:[],TRX_ABSEN:[],TRX_KEUANGAN:[],LOG_AKTIVITAS:[]
 };

@@ -157,3 +157,13 @@ table.t th.r,table.t td.r{padding-right:14px}
 .lr img.fl{width:130px;height:90px;object-fit:cover;display:block;margin:0 auto}
 .lr .pb{page-break-before:always;margin-top:28px}
 @media print{.lr .pb{margin-top:0}.lr tr{page-break-inside:avoid}}
+.lr{font-family:Arial,Helvetica,sans-serif}
+.lr.frm{border:1px solid #000;border-bottom:0;padding:14px 16px 0}
+.lr .bl{color:#1a1ae6}
+.lr table.lb td.g{background:#fff;font-size:13px}
+.lr table.lb td.r2{text-align:right;padding-right:8px}
+.lr table.lb.dk td{height:92px}
+.lr table.lb.dk th{border-bottom:3px double #000}
+.lr table.lid td:nth-child(2){border-bottom:1px solid #000;min-width:240px}
+.lr table.lid td:first-child{width:105px}
+@media print{.lr.frm{border-bottom:0}}
