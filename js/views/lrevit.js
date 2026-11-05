@@ -32,7 +32,7 @@ const BLN=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','De
 const tglS=d=>{if(!d)return '-';const[y,m,t]=d.split('-');return t+'-'+BLN[m-1]+'-'+y.slice(2)};
 /* Data bantuan sesuai PKS (Daftar Menu Revitalisasi Sesuai PKS): [nama, jumlah, satuan, nilai Rp] */
 const PKS={
- baru:[['Ruang Kelas Baru',1,'Ruang',232444000],['Ruang Administrasi',0,'Ruang',0],['Ruang Perpustakaan',0,'Ruang',0],['Ruang Laboratorium',0,'Ruang',0],['Ruang UKS',0,'Ruang',0],['Rumah Dinas Guru',0,'Ruang',0],['Ruang Inklusi',0,'Ruang',0],['Satap',0,'Unit',0],['Toilet Baru',0,'Unit',0]],
+ baru:[['Ruang Kelas Baru',1,'Ruang',232444000]],
  rehab:[['Ruang Teori/Kelas 1',1,'Ruang',114801000],['Ruang Teori/Kelas 2',1,'Ruang',131668000],['Ruang Teori/Kelas 3',1,'Ruang',114802000],['Ruang Teori/Kelas 4',1,'Ruang',131672000],['Ruang Teori/Kelas 5',1,'Ruang',131684000],['Ruang Teori/Kelas 6',1,'Ruang',131684000],['Ruang Kepala Sekolah',1,'Ruang',62216000],['Ruang Guru',1,'Ruang',175152000],['Toilet (Kamar Mandi/WC)',1,'Ruang',83334000],['Penataan Lingkungan',0,'Lingkungan',0]],
  mebeler:['Mebeler (Perabot)',1,'Paket',25088000],admin:66620955};
 
