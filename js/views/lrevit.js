@@ -32,7 +32,7 @@ const BLN=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','De
 const tglS=d=>{if(!d)return '-';const[y,m,t]=d.split('-');return t+'-'+BLN[m-1]+'-'+y.slice(2)};
 /* Data bantuan sesuai PKS (Daftar Menu Revitalisasi Sesuai PKS): [nama, jumlah, satuan, nilai Rp] */
 const PKS={
- baru:[['Ruang Kelas Baru',1,'Ruang',232444000]],
+ baru:[['Ruang Kelas Baru',1,'Ruang',232444000],['Ruang Administrasi',0,'Ruang',0],['Ruang Perpustakaan',0,'Ruang',0],['Ruang Laboratorium',0,'Ruang',0],['Ruang UKS',0,'Ruang',0],['Rumah Dinas Guru',0,'Ruang',0],['Ruang Inklusi',0,'Ruang',0],['Satap',0,'Unit',0],['Toilet Baru',0,'Unit',0]],
  rehab:[['Ruang Teori/Kelas 1',1,'Ruang',114801000],['Ruang Teori/Kelas 2',1,'Ruang',131668000],['Ruang Teori/Kelas 3',1,'Ruang',114802000],['Ruang Teori/Kelas 4',1,'Ruang',131672000],['Ruang Teori/Kelas 5',1,'Ruang',131684000],['Ruang Teori/Kelas 6',1,'Ruang',131684000],['Ruang Kepala Sekolah',1,'Ruang',62216000],['Ruang Guru',1,'Ruang',175152000],['Toilet (Kamar Mandi/WC)',1,'Ruang',83334000],['Penataan Lingkungan',0,'Lingkungan',0]],
  mebeler:['Mebeler (Perabot)',1,'Paket',25088000],admin:66620955};
 
@@ -73,4 +73,14 @@ function cetakRevit(k,v){
   <div class="ttd" style="margin-top:20px">${[['Kepala Sekolah',c.nama_kepsek],['P2SP',c.nama_p2sp],['PENGAWAS',c.nama_pengawas]].map(x=>`<div>${x[0]}<br><br><br><br><br><u>${esc(x[1]||'..............................')}</u></div>`).join('')}</div></div>`;
  $('print').innerHTML=`<div class="noprint" style="position:sticky;top:0;background:#fff;border-bottom:1px solid #E2E8F0;padding:10px 16px;display:flex;gap:10px;justify-content:center"><button class="btn sm" onclick="print()">Cetak atau simpan PDF</button><button class="btn sm alt" onclick="$('print').hidden=true">Tutup</button></div><div class="doc">${p1}${p2}</div>`;
  $('print').hidden=false;$('print').scrollTop=0;
+}
+
+/* Isi item RAB sesuai PKS ke DB_RAB supaya langsung bisa dipilih di Progres harian (tidak menimpa, hanya menambah yang belum ada) */
+function isiRabPks(){
+ const nz=t=>String(t).toLowerCase().replace(/[^a-z0-9]/g,'');
+ const daftar=[...PKS.rehab.filter(x=>x[3]).map(x=>['Rehab '+x[0],x[1],x[2],x[3]]),['Pembangunan Ruang Kelas Baru (RKB)',1,'Ruang',PKS.baru[0][3]],['Perabot Ruang Kelas Baru (RKB)',1,'Paket',PKS.mebeler[3]]];
+ let n=0;
+ daftar.forEach(x=>{if(db.DB_RAB.some(r=>nz(r.uraian_pekerjaan)===nz(x[0])))return;db.DB_RAB.push({id_rab:'RAB-'+String(nextN(db.DB_RAB,'id_rab')).padStart(2,'0'),uraian_pekerjaan:x[0],volume:x[1],satuan:x[2],harga_satuan:x[3]});n++});
+ if(!n)return toast('Semua item RAB sesuai PKS sudah ada.');
+ log('Pengaturan','RAB diisi sesuai PKS: '+n+' item');commit();toast(n+' item RAB ditambahkan. Sekarang bisa dipilih di Progres harian.');go(page);
 }

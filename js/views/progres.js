@@ -1,5 +1,5 @@
 V.progres=()=>{
- if(!db.DB_RAB.length)return `<div class="pn">${empty('Belum ada item pekerjaan RAB.',user.role==='sek'?'<button class="btn mt-4" onclick="go(\'setting\')">Tambah RAB di Pengaturan</button>':'')}</div>`;
+ if(!db.DB_RAB.length)return `<div class="pn">${empty('Belum ada item pekerjaan RAB.',user.role==='sek'||user.role==='op'?'<button class="btn mt-4" onclick="isiRabPks()">Isi item RAB sesuai PKS</button><button class="btn alt mt-3" onclick="go(\'setting\')">Tambah RAB di Pengaturan</button>':'')}</div>`;
  const h=db.TRX_PROGRES.map((x,i)=>[x,i]).slice(-6).reverse();
  return `<form id="fp" class="pn" onsubmit="subProgres(event)">
   ${F('Tanggal',`<input class="in" type="date" name="tgl" value="${today()}" required>`)}

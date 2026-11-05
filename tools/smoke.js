@@ -126,6 +126,7 @@ run("db.CONFIG.npsn='30523505';db.CONFIG.kab_kota='JEMBER';db.CONFIG.provinsi='J
  {const rv=[["h","2026-11-04"],["m",1],["b","2026-11"]].map(a=>run("cetakRevit('"+a[0]+"',"+JSON.stringify(a[1])+");$('print').innerHTML"));
  ok('Laporan Revit harian/mingguan/bulanan: kop program, NPSN, tanda tangan P2SP dan Pengawas, dokumentasi',rv.every(h=>h.includes('PROGRAM REVITALISASI')&&h.includes('30523505')&&h.includes('ABD. ROHIM')&&h.includes('DOKUMENTASI LAPORAN'))&&rv[0].includes('LAPORAN HARIAN')&&rv[1].includes('MINGGUAN KE-1')&&rv[2].includes('BULANAN'));
  ok('Laporan Revit memuat data PKS: total 1.401.165.955 dan Ruang Guru',rv.every(h=>h.includes('1.401.165.955')&&h.includes('Ruang Guru')&&h.includes('232.444.000')));
+ ok('Isi RAB sesuai PKS: 11 item, total 1.334.545.000, tidak ganda saat diulang',run("(()=>{const b=db.DB_RAB;db.DB_RAB=[];isiRabPks();isiRabPks();const r=db.DB_RAB.reduce((a,x)=>a+jumlah(x),0)+'|'+db.DB_RAB.length;db.DB_RAB=b;return r})()")==='1334545000|11');
  ok('Laporan Revit bebas NaN dan undefined',!rv.some(h=>/NaN|undefined|Infinity/.test(h)));
  ok('halaman Laporan Revit tampil',run("V.lrevit()").includes('Lihat laporan'));}
  run("subPin(fo({sekretaris:'1111',mandor:'2222',kepsek:'3333',bendahara:'1111'}))");
