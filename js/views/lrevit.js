@@ -30,7 +30,11 @@ const rvTgl=d=>d?longD(d):'-';
 
 const BLN=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
 const tglS=d=>{if(!d)return '-';const[y,m,t]=d.split('-');return t+'-'+BLN[m-1]+'-'+y.slice(2)};
-const BARU=[['Ruang Kelas Baru','Ruang'],['Ruang Administrasi','Ruang'],['Ruang Perpustakaan','Ruang'],['Ruang Laboratorium','Ruang'],['Ruang UKS','Ruang'],['Rumah Dinas Guru','Ruang'],['Ruang Inklusi','Ruang'],['Satap','Unit'],['Toilet Baru','Unit']];
+/* Data bantuan sesuai PKS (Daftar Menu Revitalisasi Sesuai PKS): [nama, jumlah, satuan, nilai Rp] */
+const PKS={
+ baru:[['Ruang Kelas Baru',1,'Ruang',232444000],['Ruang Administrasi',0,'Ruang',0],['Ruang Perpustakaan',0,'Ruang',0],['Ruang Laboratorium',0,'Ruang',0],['Ruang UKS',0,'Ruang',0],['Rumah Dinas Guru',0,'Ruang',0],['Ruang Inklusi',0,'Ruang',0],['Satap',0,'Unit',0],['Toilet Baru',0,'Unit',0]],
+ rehab:[['Ruang Teori/Kelas 1',1,'Ruang',114801000],['Ruang Teori/Kelas 2',1,'Ruang',131668000],['Ruang Teori/Kelas 3',1,'Ruang',114802000],['Ruang Teori/Kelas 4',1,'Ruang',131672000],['Ruang Teori/Kelas 5',1,'Ruang',131684000],['Ruang Teori/Kelas 6',1,'Ruang',131684000],['Ruang Kepala Sekolah',1,'Ruang',62216000],['Ruang Guru',1,'Ruang',175152000],['Toilet (Kamar Mandi/WC)',1,'Ruang',83334000],['Penataan Lingkungan',0,'Lingkungan',0]],
+ mebeler:['Mebeler (Perabot)',1,'Paket',25088000],admin:66620955};
 
 function cetakRevit(k,v){
  if(!v)return toast('Pilih tanggal, minggu, atau bulannya dulu.','err');
@@ -41,13 +45,13 @@ function cetakRevit(k,v){
  const naik=r=>sum(prog.filter(x=>x.id_rab===r.id_rab),'persen_hari_ini');
  const ln=(l,t)=>`<tr><td>${l}</td><td>: <span class="bl">${t}</span></td></tr>`;
  const bd=t=>`<tr><td colspan="6" class="g"><b>${t}</b></td></tr>`;
- const adm=num(c.nilai_admin),tot=db.DB_RAB.reduce((t,r)=>t+jumlah(r),0)+adm;
- /* ===== Halaman 1: seperti Laporan Pendahuluan ===== */
+ const adm=num(c.nilai_admin)||PKS.admin,tot=[...PKS.baru,...PKS.rehab,PKS.mebeler].reduce((t,x)=>t+x[3],0)+adm;
+ const rz=nm=>{const q=nm.toLowerCase().replace(/[^a-z0-9]/g,''),r=db.DB_RAB.find(r=>String(r.uraian_pekerjaan).toLowerCase().replace(/[^a-z0-9]/g,'').includes(q));return r?', realisasi '+fmt(kumSd(r.id_rab,z))+'%'+(naik(r)?' (naik '+fmt(naik(r))+'%)':''):''};
+ const brs=(arr,real)=>arr.map((x,i)=>`<tr><td class="r2">${i+1}</td><td>${esc(x[0])}</td><td class="c">${x[1]}</td><td>${x[2]}</td><td class="r">${x[3]?fmt(x[3]):'-'}</td><td class="c">${x[3]?'Sesuai PKS'+(real?rz(x[0]):''):''}</td></tr>`).join('');
  const tabel=`<table class="lb"><tr><th style="width:34px">No.</th><th>Bantuan yang Diterima</th><th style="width:60px">Jumlah</th><th style="width:72px">Satuan</th><th style="width:120px">Nilai Rupiah</th><th style="width:190px">Keterangan</th></tr>
- ${bd('Bangun Baru')}${BARU.map((x,i)=>`<tr><td class="r2">${i+1}</td><td>${x[0]}</td><td class="c">0</td><td>${x[1]}</td><td class="r">-</td><td></td></tr>`).join('')}
- ${bd('Rehab')}${db.DB_RAB.map((r,i)=>`<tr><td class="r2">${i+1}</td><td>${esc(r.uraian_pekerjaan)}</td><td class="c">${fmt(r.volume)}</td><td>${esc(r.satuan)}</td><td class="r">${fmt(jumlah(r))}</td><td class="c">Sesuai PKS, realisasi ${fmt(kumSd(r.id_rab,z))}%${naik(r)?' (naik '+fmt(naik(r))+'%)':''}</td></tr>`).join('')||'<tr><td colspan="6" class="c">Belum ada item RAB.</td></tr>'}
- <tr><td></td><td class="g"><b>Mebeler</b></td><td class="c">0</td><td class="c">-</td><td class="r">-</td><td></td></tr>
- <tr><td></td><td class="g"><b>Administrasi</b></td><td></td><td></td><td class="r">${adm?fmt(adm):'-'}</td><td class="c">Sesuai PKS</td></tr>
+ ${bd('Bangun Baru')}${brs(PKS.baru,1)}${bd('Rehab')}${brs(PKS.rehab,1)}
+ <tr><td></td><td class="g"><b>${PKS.mebeler[0]}</b></td><td class="c">${PKS.mebeler[1]}</td><td>${PKS.mebeler[2]}</td><td class="r">${fmt(PKS.mebeler[3])}</td><td class="c">Sesuai PKS</td></tr>
+ <tr><td></td><td class="g"><b>Administrasi</b></td><td></td><td></td><td class="r">${fmt(adm)}</td><td class="c">Sesuai PKS</td></tr>
  <tr><td></td><td></td><td></td><td class="r">Jumlah</td><td class="r">${fmt(tot)}</td><td class="c">Sesuai PKS</td></tr></table>
  <p style="font-size:11px;margin:3px 0 0 28px">Catatan&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: Beri Tanda 0 jika tidak termasuk terima bantuan</p>`;
  const info=[['Tanggal Perjanjian Kerjasama (PKS)',rvTgl(c.tgl_pks)],['No. Perjanjian Kerjasama',esc(c.no_pks||'-')],['Tanggal Dana Masuk Ke Rek Sekolah',rvTgl(c.tgl_dana)],['Dana 70 %',c.dana_70?rp(c.dana_70):'-'],['Lampiran-lampiran','Dokumentasi progres '+fmt(f)+'% bangunan'],['Progres fisik sampai akhir periode',fmt(f)+'%'],['Realisasi dana keluar sampai akhir periode',rp(kasKeluar)]];
